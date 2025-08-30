@@ -1,0 +1,56 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+interface RateHistory {
+  email: string
+  discipline: string
+  experience: string
+  location: string
+  rates: {
+    day: number
+    date: string
+    factors: string[]
+  }[]
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { email, discipline, experience, location, rates } = await request.json()
+    
+    // In production, this would save to your database
+    // For now, we'll simulate the response
+    
+    const rateHistory = {
+      email,
+      discipline, 
+      experience,
+      location,
+      currentRate: rates.day.mid,
+      previousRate: rates.day.mid * 0.85, // Simulate 15% growth
+      growthPercentage: 15,
+      marketPosition: 'Above Average', // Based on their rate vs market
+      nextMilestone: rates.day.mid * 1.2,
+      insights: [
+        `Your rates increased 15% since last calculation`,
+        `You're pricing above 67% of ${discipline}s in ${location}`,
+        `Consider raising rates - you're underpricing vs market leaders`
+      ]
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      rateHistory,
+      upgradePrompt: {
+        title: "Unlock Advanced Rate Insights",
+        features: [
+          "Monthly market rate reports for your discipline",
+          "Client-specific rate recommendations", 
+          "Automated rate increase templates",
+          "1-on-1 pricing strategy consultation"
+        ]
+      }
+    })
+
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to save rates' }, { status: 500 })
+  }
+}
