@@ -159,6 +159,54 @@ const Results: React.FC<ResultsProps> = ({ rates, inputs, onBack, onRestart }) =
           </CardContent>
         </Card>
 
+        {/* Path to Target Income */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5 text-purple-500" />
+              <span>Path to Target Income</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {inputs.annualIncomeTarget && (
+              <div className="space-y-3">
+                {(() => {
+                  const annualTarget = inputs.annualIncomeTarget as number
+                  const billableDays = inputs.billableDays || 140
+                  const hoursPerDay = inputs.billableHoursPerDay || 7.5
+                  const dayRate = currentRates.mid
+                  const hourRate = Math.round((dayRate / hoursPerDay) / 5) * 5
+                  const neededDays = Math.ceil(annualTarget / dayRate)
+                  const neededHours = Math.ceil(annualTarget / hourRate)
+                  const weeklyDays = Math.round((billableDays / 12) / 4) // avg per week across a year
+                  const onTrack = neededDays <= billableDays
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Annual target</span>
+                        <span>{formatCurrency(annualTarget, inputs.currency)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Billable capacity</span>
+                        <span>{billableDays} days · {hoursPerDay} hrs/day</span>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600">
+                        <span>Required to hit target</span>
+                        <span>{neededDays} days ({neededHours} hrs)</span>
+                      </div>
+                      <div className={`mt-2 p-3 rounded-lg ${onTrack ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-800'}`}>
+                        {onTrack
+                          ? 'You are on track to hit your target with the recommended rate.'
+                          : 'You may need to increase your rate, bill more days, or adjust target.'}
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Experience Comparison */}
         <Card>
           <CardHeader>

@@ -132,6 +132,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ onSubmit, onBack }) => 
           rushJob: formData.rushJob || false,
           annualIncomeTarget: formData.annualIncomeTarget,
           billableDays: formData.billableDays,
+          billableHoursPerDay: formData.billableHoursPerDay,
           scopeDays: formData.scopeDays,
         }
         onSubmit(completeData)
@@ -220,6 +221,16 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ onSubmit, onBack }) => 
               placeholder="140"
               error={errors.billableDays}
               helperText="How many days you plan to work annually (default: 140)"
+            />
+
+            <Input
+              type="number"
+              step="0.5"
+              label="Billable hours per day (optional)"
+              value={formData.billableHoursPerDay || ''}
+              onChange={(e) => handleInputChange('billableHoursPerDay', e.target.value ? parseFloat(e.target.value) : undefined)}
+              placeholder="7.5"
+              helperText="Used to derive hourly rates from your day rate (default: 7.5)"
             />
           </div>
         )
