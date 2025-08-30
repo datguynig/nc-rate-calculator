@@ -38,7 +38,7 @@ Create a `.env.local` file in the root directory with **one** of these options:
 #### Option 1: Formspree (Recommended - Works Everywhere)
 ```bash
 # Create a free form at formspree.io
-FORMSPREE_ENDPOINT=https://formspree.io/f/YOUR_FORM_ID
+FORMSPREE_ENDPOINT=https://formspree.io/f/xldwbedl
 
 # Analytics (optional)
 NEXT_PUBLIC_PLAUSIBLE_DOMAIN=your_domain.com
@@ -78,6 +78,21 @@ NEXT_PUBLIC_PLAUSIBLE_DOMAIN=your_domain.com
 ```bash
 npm run dev
 ```
+
+### Codespaces: Testing Email + PDF
+
+1. In the Codespace terminal, create `.env.local` with your endpoint:
+```bash
+echo "FORMSPREE_ENDPOINT=https://formspree.io/f/xldwbedl" > .env.local
+```
+2. Start the dev server:
+```bash
+npm run dev
+```
+3. Open the forwarded port in a browser (not the preview) and go to `/calculator`.
+4. Fill out the form. To personalize rates, provide Annual income target and Billable days.
+5. On results, click "Download PDF Report". If prompted, enter email; the PDF will download automatically after success.
+6. Check your Formspree dashboard or email for the submission.
 
 Visit [http://localhost:3000](http://localhost:3000) to see the app.
 
