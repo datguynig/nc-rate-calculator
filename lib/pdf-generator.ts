@@ -6,9 +6,12 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
   const pdf = new jsPDF()
   
   // Set up fonts and colors
-  const primaryColor = [0, 0, 0] // Black
-  const accentColor = [255, 203, 176] // NewComma accent
-  const textColor = [100, 100, 100] // Gray
+  const primaryColor: [number, number, number] = [0, 0, 0]
+  const accentColor: [number, number, number] = [255, 203, 176]
+  const textColor: [number, number, number] = [100, 100, 100]
+  const [pr, pg, pb] = primaryColor
+  const [ar, ag, ab] = accentColor
+  const [tr, tg, tb] = textColor
   
   let yPosition = 30
   const pageWidth = pdf.internal.pageSize.getWidth()
@@ -16,7 +19,7 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
 
   // Header with logo placeholder
   pdf.setFontSize(24)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(pr, pg, pb)
   pdf.text('NewComma', margin, yPosition)
   
   pdf.setFontSize(18)
@@ -25,14 +28,14 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
 
   // Date
   pdf.setFontSize(10)
-  pdf.setTextColor(...textColor)
+  pdf.setTextColor(tr, tg, tb)
   yPosition += 8
   pdf.text(`Generated on ${new Date().toLocaleDateString('en-GB')}`, margin, yPosition)
 
   // Inputs Summary
   yPosition += 20
   pdf.setFontSize(14)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(pr, pg, pb)
   pdf.text('Your Details', margin, yPosition)
   
   pdf.setFontSize(10)
@@ -77,7 +80,7 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
   
   // Recommended rate (highlighted)
   const recX = startX + boxWidth + boxSpacing
-  pdf.setFillColor(...accentColor)
+  pdf.setFillColor(ar, ag, ab)
   pdf.rect(recX, yPosition, boxWidth, boxHeight, 'F')
   pdf.rect(recX, yPosition, boxWidth, boxHeight)
   pdf.setFontSize(10)
@@ -96,12 +99,12 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
   // Hourly and Project rates
   yPosition += 40
   pdf.setFontSize(12)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(pr, pg, pb)
   pdf.text('Alternative Rate Formats', margin, yPosition)
   
   yPosition += 10
   pdf.setFontSize(10)
-  pdf.setTextColor(...textColor)
+  pdf.setTextColor(tr, tg, tb)
   
   const rateFormats = [
     `Hourly: ${formatCurrency(rates.hour.low, inputs.currency)} - ${formatCurrency(rates.hour.high, inputs.currency)}`,
@@ -116,12 +119,12 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
   // Reasoning
   yPosition += 15
   pdf.setFontSize(12)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(pr, pg, pb)
   pdf.text('Calculation Reasoning', margin, yPosition)
   
   yPosition += 10
   pdf.setFontSize(10)
-  pdf.setTextColor(...textColor)
+  pdf.setTextColor(tr, tg, tb)
   const splitReasoning = pdf.splitTextToSize(rates.day.reasoning, pageWidth - (margin * 2))
   pdf.text(splitReasoning, margin, yPosition)
   yPosition += splitReasoning.length * 6
@@ -129,12 +132,12 @@ export function generateRatesPDF(rates: AllRates, inputs: CalculatorInputs) {
   // Tips
   yPosition += 10
   pdf.setFontSize(12)
-  pdf.setTextColor(...primaryColor)
+  pdf.setTextColor(pr, pg, pb)
   pdf.text('Negotiation Tips', margin, yPosition)
   
   yPosition += 10
   pdf.setFontSize(10)
-  pdf.setTextColor(...textColor)
+  pdf.setTextColor(tr, tg, tb)
   
   rates.day.tips.forEach((tip, index) => {
     const tipText = `${index + 1}. ${tip}`

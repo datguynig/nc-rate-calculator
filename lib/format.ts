@@ -3,14 +3,14 @@ import { COUNTRIES } from './rates'
 export function formatCurrency(amount: number, currencyCode?: string): string {
   if (!currencyCode) return `£${amount.toLocaleString()}`
   
-  const country = COUNTRIES.find(c => c.currency === currencyCode || c.code === currencyCode)
+  const country = COUNTRIES.find(c => c.currency === currencyCode)
   const symbol = country?.symbol || '£'
   
   return `${symbol}${amount.toLocaleString()}`
 }
 
 export function getCurrencySymbol(currencyCode: string): string {
-  const country = COUNTRIES.find(c => c.currency === currencyCode || c.code === currencyCode)
+  const country = COUNTRIES.find(c => c.currency === currencyCode)
   return country?.symbol || '£'
 }
 
