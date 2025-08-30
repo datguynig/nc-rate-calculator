@@ -75,7 +75,6 @@ const EXPERIENCE_MULTIPLIERS = {
 const LOCATION_MULTIPLIERS: Record<string, number> = {
   'United Kingdom': 1.0,
   'United States': 1.1,
-  'United States': 1.1,
   'Canada': 1.05,
   'Australia': 1.05,
   'Germany': 1.0,
@@ -102,6 +101,8 @@ const USAGE_MULTIPLIERS = {
 }
 
 export function calculateAllRates(inputs: CalculatorInputs): AllRates {
+  const roundToNearestFive = (value: number) => Math.round(value / 5) * 5
+
   const baseRate = DISCIPLINE_BASELINES[inputs.discipline] || 300
   const experienceMultiplier = EXPERIENCE_MULTIPLIERS[inputs.experience]
   const locationMultiplier = LOCATION_MULTIPLIERS[inputs.location] || 1.0
@@ -109,16 +110,35 @@ export function calculateAllRates(inputs: CalculatorInputs): AllRates {
   const usageMultiplier = USAGE_MULTIPLIERS[inputs.usageRights]
   const rushMultiplier = inputs.rushJob ? 1.15 : 1.0
   
-  // Calculate benchmark (market standard)
-  const benchmarkRate = Math.round(baseRate * experienceMultiplier * locationMultiplier / 5) * 5
+  const marketBaseline = roundToNearestFive(baseRate * experienceMultiplier * locationMultiplier)
+  const effectiveBillableDays = inputs.billableDays && inputs.billableDays > 0 ? inputs.billableDays : undefined
+  const targetBaseline = inputs.annualIncomeTarget && effectiveBillableDays
+    ? roundToNearestFive(inputs.annualIncomeTarget / effectiveBillableDays)
+    : undefined
+  const targetWeight = inputs.annualIncomeTarget && effectiveBillableDays ? 0.6 : 0
+  const marketWeight = 1 - targetWeight
+  const blendedBaseline = roundToNearestFive(
+    (marketBaseline * marketWeight) + ((targetBaseline || 0) * targetWeight)
+  ) || marketBaseline
   
-  // Calculate adjusted rate (with project factors)
-  const adjustedRate = Math.round(benchmarkRate * complexityMultiplier * usageMultiplier * rushMultiplier / 5) * 5
+  const adjustedRate = roundToNearestFive(blendedBaseline * complexityMultiplier * usageMultiplier * rushMultiplier)
   
-  // Final day rates
-  const dayLow = Math.round(adjustedRate * 0.85 / 5) * 5
+  let lowSpread = 0.85
+  let highSpread = 1.15
+  if (inputs.experience === 'junior') {
+    lowSpread = 0.9
+    highSpread = 1.1
+  } else if (inputs.experience === 'senior') {
+    lowSpread = 0.85
+    highSpread = 1.2
+  }
+  if (inputs.rushJob) {
+    highSpread += 0.03
+  }
+  
   const dayMid = adjustedRate
-  const dayHigh = Math.round(adjustedRate * 1.15 / 5) * 5
+  const dayLow = roundToNearestFive(dayMid * lowSpread)
+  const dayHigh = roundToNearestFive(dayMid * highSpread)
   
   // Experience comparisons
   const experienceComparisons = [
@@ -127,32 +147,61 @@ export function calculateAllRates(inputs: CalculatorInputs): AllRates {
     { level: 'Senior (6+ years)', rate: Math.round(baseRate * 1.3 * locationMultiplier / 5) * 5 },
   ]
   
-  // Location comparisons (top 5 markets)
-  const locationComparisons = [
-    { country: 'United States', rate: Math.round(baseRate * experienceMultiplier * 1.1 / 5) * 5 },
-    { country: 'Netherlands', rate: Math.round(baseRate * experienceMultiplier * 1.05 / 5) * 5 },
-    { country: 'Australia', rate: Math.round(baseRate * experienceMultiplier * 1.05 / 5) * 5 },
-    { country: 'Canada', rate: Math.round(baseRate * experienceMultiplier * 1.05 / 5) * 5 },
-    { country: 'United Kingdom', rate: Math.round(baseRate * experienceMultiplier * 1.0 / 5) * 5 },
-  ].sort((a, b) => b.rate - a.rate)
+  const comparisonCountries = ['United States', 'Netherlands', 'Australia', 'Canada', 'United Kingdom']
+  if (!comparisonCountries.includes(inputs.location)) {
+    comparisonCountries.push(inputs.location)
+  }
+  const locationComparisons = comparisonCountries
+    .map(country => {
+      const lm = LOCATION_MULTIPLIERS[country] || 1.0
+      return { country, rate: roundToNearestFive(baseRate * experienceMultiplier * lm) }
+    })
+    .sort((a, b) => b.rate - a.rate)
 
   return {
     day: {
       low: dayLow,
       mid: dayMid,
       high: dayHigh,
-      reasoning: `Based on ${inputs.experience} ${inputs.discipline} rates in ${inputs.location}, adjusted for project complexity and usage requirements.`,
-      tips: [
-        'Set clear scope boundaries to prevent scope creep',
-        'Request 25-50% deposit before starting work',
-        'Review and adjust rates annually based on experience'
-      ]
+      reasoning: (() => {
+        const reasons: string[] = []
+        if (targetBaseline) {
+          reasons.push(
+            `Blended your target day rate of ${targetBaseline.toLocaleString()} (from ${(inputs.annualIncomeTarget as number).toLocaleString()} across ${effectiveBillableDays} billable days)`
+          )
+          reasons.push(`with ${inputs.experience} ${inputs.discipline} market rates in ${inputs.location}.`)
+        } else {
+          reasons.push(`Based on ${inputs.experience} ${inputs.discipline} market rates in ${inputs.location}.`)
+        }
+        const factors: string[] = []
+        factors.push(`${inputs.complexity} complexity`)
+        factors.push(`${inputs.usageRights} usage rights`)
+        if (inputs.rushJob) factors.push('rush timeline')
+        reasons.push(`Adjusted for ${factors.join(', ')}.`)
+        return reasons.join(' ')
+      })(),
+      tips: (() => {
+        const t: string[] = []
+        t.push('Set clear scope boundaries to prevent scope creep')
+        t.push('Request 25-50% deposit before starting work')
+        if (inputs.usageRights === 'extended') {
+          t.push('Detail licensing terms for extended usage in your contract')
+        }
+        if (inputs.rushJob) {
+          t.push('Include a visible rush fee line item in your proposal')
+        }
+        if (inputs.annualIncomeTarget && effectiveBillableDays) {
+          t.push('Revisit billable days and buffer for holidays and admin time')
+        }
+        t.push('Review and adjust rates every 6–12 months based on results')
+        return t
+      })()
     },
     hour: {
-      low: Math.round(dayLow / 7.5 / 5) * 5,
-      mid: Math.round(dayMid / 7.5 / 5) * 5,
-      high: Math.round(dayHigh / 7.5 / 5) * 5,
-      reasoning: 'Hourly rates based on 7.5 hour work day standard.',
+      low: roundToNearestFive(dayLow / 7.5),
+      mid: roundToNearestFive(dayMid / 7.5),
+      high: roundToNearestFive(dayHigh / 7.5),
+      reasoning: 'Hourly rates derived from a 7.5-hour working day baseline.',
       tips: [
         'Track time accurately with time tracking tools',
         'Set minimum billable increments (e.g., 15 minutes)',
@@ -160,10 +209,10 @@ export function calculateAllRates(inputs: CalculatorInputs): AllRates {
       ]
     },
     project: {
-      low: Math.round(dayLow * (inputs.scopeDays || 3) / 5) * 5,
-      mid: Math.round(dayMid * (inputs.scopeDays || 5) / 5) * 5,
-      high: Math.round(dayHigh * (inputs.scopeDays || 7) / 5) * 5,
-      reasoning: `Project rates based on ${inputs.scopeDays || '3-7'} day scope estimate.`,
+      low: roundToNearestFive(dayLow * (inputs.scopeDays || 3)),
+      mid: roundToNearestFive(dayMid * (inputs.scopeDays || 5)),
+      high: roundToNearestFive(dayHigh * (inputs.scopeDays || 7)),
+      reasoning: `Project rates based on a ${inputs.scopeDays || '3–7'} day scope estimate and your adjusted day rate.`,
       tips: [
         'Define deliverables clearly in your proposal',
         'Limit number of revision rounds included',
@@ -173,7 +222,7 @@ export function calculateAllRates(inputs: CalculatorInputs): AllRates {
     breakdown: {
       baseRate,
       adjustedRate,
-      benchmarkRate,
+      benchmarkRate: marketBaseline,
       factors: {
         experience: { 
           multiplier: experienceMultiplier, 
