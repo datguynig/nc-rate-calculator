@@ -1,0 +1,21 @@
+{
+  "name": "NewComma Day Rate Calculator",
+  "short_name": "Rate Calculator",
+  "description": "Calculate fair freelance rates for creative professionals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffcbb0",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

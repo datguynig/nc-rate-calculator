@@ -1,0 +1,55 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="url(#background)"/>
+  
+  <!-- Logo -->
+  <rect x="100" y="80" width="64" height="64" rx="16" fill="url(#accent)"/>
+  <text x="130" y="125" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="700" fill="black" text-anchor="middle">NC</text>
+  
+  <!-- Main Title -->
+  <text x="100" y="220" font-family="Inter, system-ui, sans-serif" font-size="64" font-weight="800" fill="#111827">
+    Are you charging
+  </text>
+  <text x="100" y="290" font-family="Inter, system-ui, sans-serif" font-size="64" font-weight="800" fill="url(#accent)">
+    enough?
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="100" y="340" font-family="Inter, system-ui, sans-serif" font-size="24" fill="#6B7280">
+    Find your fair freelance rate in under a minute
+  </text>
+  
+  <!-- Rate Cards -->
+  <rect x="100" y="400" width="180" height="120" rx="12" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="130" y="430" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">CONSERVATIVE</text>
+  <text x="130" y="460" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827" text-anchor="middle">£350</text>
+  
+  <rect x="300" y="385" width="180" height="135" rx="12" fill="url(#accent-light)" stroke="url(#accent)" stroke-width="2"/>
+  <text x="330" y="415" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="black" text-anchor="middle">RECOMMENDED</text>
+  <text x="330" y="445" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="black" text-anchor="middle">£450</text>
+  <rect x="360" y="390" width="80" height="20" rx="10" fill="url(#accent)"/>
+  <text x="400" y="404" font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="600" fill="black" text-anchor="middle">Best Value</text>
+  
+  <rect x="500" y="400" width="180" height="120" rx="12" fill="white" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="530" y="430" font-family="Inter, system-ui, sans-serif" font-size="12" font-weight="600" fill="#6B7280" text-anchor="middle">PREMIUM</text>
+  <text x="530" y="460" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#111827" text-anchor="middle">£550</text>
+  
+  <!-- Bottom text -->
+  <text x="100" y="570" font-family="Inter, system-ui, sans-serif" font-size="16" fill="#6B7280">
+    Trusted by 10,000+ creative freelancers • rates.newcomma.com
+  </text>
+  
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F9FAFB"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffcbb0"/>
+      <stop offset="1" stop-color="#ff9a6b"/>
+    </linearGradient>
+    <linearGradient id="accent-light" x1="0" y1="0" x2="180" y2="135" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffcbb0" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#ff9a6b" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+</svg>
