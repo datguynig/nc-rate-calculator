@@ -123,7 +123,6 @@ const EmailCapture: React.FC<EmailCaptureProps> = ({
       {/* Hidden Netlify form for form detection */}
       <form 
         name="rate-calculator-signup" 
-        netlify="true" 
         hidden
         data-netlify="true"
       >

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { AllRates } from '@/lib/rates'
+import { AllRates, CalculatorInputs } from '@/lib/rates'
 import { formatCurrency } from '@/lib/format'
 import { ResultGrid } from '@/components/ui/ResultGrid'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -10,10 +10,11 @@ import Button from '@/components/ui/Button'
 import Modal from '@/components/ui/Modal'
 import EmailCapture from '@/components/forms/EmailCapture'
 import { Download, ArrowLeft, TrendingUp, Globe, Award } from 'lucide-react'
+import { generateRatesPDF } from '@/lib/pdf-generator'
 
 interface ResultsProps {
   rates: AllRates
-  inputs: any
+  inputs: CalculatorInputs
   onBack: () => void
   onRestart: () => void
 }
@@ -22,12 +23,27 @@ const Results: React.FC<ResultsProps> = ({ rates, inputs, onBack, onRestart }) =
   const [activeTab, setActiveTab] = useState<'day' | 'hour' | 'project'>(inputs.workType)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [emailCaptured, setEmailCaptured] = useState(false)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [pdfError, setPdfError] = useState<string | null>(null)
 
   const currentRates = rates[activeTab]
 
+  const doGeneratePDF = async () => {
+    try {
+      setPdfError(null)
+      setPdfLoading(true)
+      await Promise.resolve(generateRatesPDF(rates, inputs))
+    } catch (err) {
+      console.error(err)
+      setPdfError('Failed to generate PDF. Please try again.')
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
   const handleDownloadPDF = () => {
     if (emailCaptured) {
-      console.log('Generating PDF...')
+      void doGeneratePDF()
     } else {
       setShowEmailModal(true)
     }
@@ -36,7 +52,7 @@ const Results: React.FC<ResultsProps> = ({ rates, inputs, onBack, onRestart }) =
   const handleEmailSuccess = () => {
     setEmailCaptured(true)
     setShowEmailModal(false)
-    console.log('Generating PDF...')
+    void doGeneratePDF()
   }
 
   const tabs = [
@@ -280,12 +296,17 @@ const Results: React.FC<ResultsProps> = ({ rates, inputs, onBack, onRestart }) =
           variant="tertiary"
           size="lg"
           onClick={handleDownloadPDF}
+          loading={pdfLoading}
           className="flex items-center space-x-2"
         >
           <Download className="h-4 w-4" />
           <span>Download PDF Report</span>
         </Button>
       </div>
+
+      {pdfError && (
+        <div className="text-center text-sm text-red-600">{pdfError}</div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="flex justify-between items-center pt-8 border-t border-gray-200">
